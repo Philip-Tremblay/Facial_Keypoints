@@ -18,31 +18,27 @@ class Net(nn.Module):
         # input tensor: (1, 224, 224)
         self.conv1 = nn.Conv2d(1, t, 5)
         # pooling
-        # output tensor: (, 110, 110)
+        # output tensor: (t, 110, 110)
         #self.conv1_bn = nn.BatchNorm2d(t)
         
         self.conv2 = nn.Conv2d(t, 2*t, 5)
         # pooling
-        # output tensor: (, 54, 54)
+        # output tensor: (6, 54, 54)
         #self.conv2_bn = nn.BatchNorm2d(2*t)
         
-        self.conv3 = nn.Conv2d(2*t, 2*t, 3)
-        # output tensor: (, 54, 54)
-        #self.conv2_bn = nn.BatchNorm2d(2*t)
-        
-        self.conv4 = nn.Conv2d(2*t, 4*t, 3)
+        self.conv3 = nn.Conv2d(2*t, 4*t, 3)
         # pooling
-        # output tensor: (, 25, 25)
-        #self.conv3_bn = nn.BatchNorm2d(4*t)
+        # output tensor: (12, 25, 25)
+        #self.conv3_bn = nn.BatchNorm2d(3*t)
         
-        self.conv5 = nn.Conv2d(4*t, 8*t, 2)
+        self.conv4 = nn.Conv2d(4*t, 8*t, 2)
         # pooling
-        # output tensor: (, 11, 11) 
+        # output tensor: (8t, 12, 12) 
         #self.conv4_bn = nn.BatchNorm2d(8*t)
         
         self.pool = nn.MaxPool2d(2, 2)
         
-        cv_size=t*11*11
+        cv_size=t*12*12
         
         self.fc1 = nn.Linear(8*cv_size, 4*cv_size)
         self.fc2 = nn.Linear(4*cv_size, 2*cv_size)
@@ -65,9 +61,9 @@ class Net(nn.Module):
         '''
         x = self.pool(F.relu(self.conv1(x)))
         x = self.pool(F.relu(self.conv2(x)))
-        x = F.relu(self.conv3(x))
+        x = self.pool(F.relu(self.conv3(x)))
         x = self.pool(F.relu(self.conv4(x)))
-        x = self.pool(F.relu(self.conv5(x)))
+        
         
         # flatten
         x = x.view(x.size(0), -1)
